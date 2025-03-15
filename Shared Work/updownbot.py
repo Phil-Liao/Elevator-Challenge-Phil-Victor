@@ -54,7 +54,7 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-
+      
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))

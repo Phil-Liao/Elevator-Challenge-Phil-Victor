@@ -1,4 +1,4 @@
-def assign_elevator(elevators:dict, request):
+def assign_elevator(elevators, request):
     closest_elevator = None
     min_distance = float('inf')
 
