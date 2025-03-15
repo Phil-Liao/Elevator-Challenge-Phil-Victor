@@ -16,6 +16,8 @@ def individual_nevigation(stops, floors_assigned, current_floor, resting_floor):
     return stops
 
 
+
+
 def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
@@ -33,6 +35,7 @@ def updown_bot():
 
     while current_state["running"]:
         requests = current_state["requests"]
+        print(requests)
         # assigning requests to elevators
         commands = []
         for elevator in current_state["elevators"]:
