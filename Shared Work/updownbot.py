@@ -39,7 +39,7 @@ def updown_bot():
             stops = stopping_plan[elevator["id"]]["stops"]
             resting_floor = stopping_plan[elevator["id"]]["resting_floor"]
             directions[elevator["id"]] = direction
-
+            print(f"direction={directions}")
             action = MOVE  # Initialize action to MOVE by default
 
             print(elevator["buttons_pressed"])
@@ -74,7 +74,7 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-      
+
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
