@@ -1,5 +1,6 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
 
+
 def individual_nevigation(stops, floors_assigned, current_floor, resting_floor):
     # only take on floors_assigned when the elevator is empty
     # OR the elevator will pass the floor
