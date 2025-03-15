@@ -7,9 +7,9 @@ def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
         event="secondspace2025",
-        building_name="medium_random",
-        bot="updown-python-bot",
-        email="bob@mail.com",
+        building_name="big_random",
+        bot="the_best_bot_by_Phil_and_Victor",
+        email="cheweiphil@gmail.com",
         sandbox=True,
     )
     current_state = simulation.initial_state
@@ -25,15 +25,14 @@ def updown_bot():
         print(f"Requests :{requests}")
         commands = []
         stops = []
-        # assigning requests to elevators
-        for request in requests:
-            if request["floor"] in assigned_requests:
-                continue
-            closest_elevator = assign_elevator(current_state["elevators"], request, floors)
-            if closest_elevator:
-                stopping_plan = individual_navigation(stopping_plan, closest_elevator["id"], request["floor"], closest_elevator["floor"])
-                assigned_requests.append(request["floor"])
-                print(f"Assigned floor {request['floor']} to elevator {closest_elevator['id']}")
+
+        # Use dynamic scheduling to assign requests to elevators
+        assignments = dynamic_scheduling(current_state["elevators"], requests, floors)
+        
+        for elevator_id, assigned_requests in assignments.items():
+            for request in assigned_requests:
+                stopping_plan = individual_navigation(stopping_plan, elevator_id, request["floor"], next(elevator for elevator in current_state["elevators"] if elevator["id"] == elevator_id)["floor"])
+                print(f"Assigned floor {request['floor']} to elevator {elevator_id}")
 
         for elevator in current_state["elevators"]:
             # determine which direction to go
@@ -49,7 +48,7 @@ def updown_bot():
                 for button_pressed in elevator["buttons_pressed"]:
                     if button_pressed not in stops:
                         stops.append(button_pressed)
-                    stopping_plan = individual_navigation(stopping_plan, elevator["id"], request["floor"], elevator["floor"])
+                    stopping_plan = individual_navigation(stopping_plan, elevator["id"], button_pressed, elevator["floor"])
 
             if stops:
                 # if there are stops planned
