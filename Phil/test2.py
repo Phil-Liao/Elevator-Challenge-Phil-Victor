@@ -7,10 +7,10 @@ def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
         event="secondspace2025",
-        building_name="85_sky_tower",
+        building_name="big_random",
         bot="the_best_bot_by_Phil_and_Victor",
         email="cheweiphil@gmail.com",
-        sandbox=True,
+        sandbox=False,
     )
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
@@ -18,6 +18,7 @@ def updown_bot():
     stopping_plan = initial_stopping_plan(floors, current_state["elevators"])  # floors where the elevator should stop
     assigned_requests = []
     
+
     print(f"Stopping Plan: {stopping_plan}")
 
     while current_state["running"]:
@@ -87,4 +88,9 @@ def updown_bot():
     print("Replay URL:", current_state.get("replay_url"))
 
 if __name__ == "__main__":
-    updown_bot()
+    while True:
+        try:
+            updown_bot()
+            break
+        except ConnectionError:
+            print("error")
