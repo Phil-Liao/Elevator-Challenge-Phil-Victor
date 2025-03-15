@@ -47,7 +47,7 @@ def updown_bot():
                 for button_pressed in elevator["buttons_pressed"]:
                     if button_pressed not in stops:
                         stops.append(button_pressed)
-                    stops = individual_nevigation(stops, button_pressed, elevator["floor"])
+                    stopping_plan = individual_navigation(stopping_plan, elevator["id"], request["floor"], elevator["floor"])
 
             if stops:
                 # if there are stops planned
