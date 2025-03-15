@@ -1,5 +1,8 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
 from individual_nevigation import individual_nevigation
+from assign_elevator import assign_elevator
+from initial_stopping_plan import initial_stopping_plan
+
 
 def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
@@ -12,7 +15,7 @@ def updown_bot():
     )
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
-    stopping_plan = {} # floors where the elevator should stop
+    stopping_plan = initial_stopping_plan(current_state["num_floors"], current_state["elevators"]) # floors where the elevator should stop
     
     for elevator in current_state["elevators"]:
         stopping_plan[elevator["id"]] = {
