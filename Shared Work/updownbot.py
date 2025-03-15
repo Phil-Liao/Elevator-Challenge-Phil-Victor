@@ -33,18 +33,28 @@ def updown_bot():
             resting_floor = stopping_plan[elevator["id"]]["resting_floor"]
             directions[elevator["id"]] = direction
 
-            if direction == UP and elevator["floor"] > stops[0]:
-                direction = DOWN
-            elif direction == DOWN and elevator["floor"] < stops[0]:
+            if stops:
+                # if there are stops planned
                 direction = UP
-
-            action = MOVE
-            if elevator["floor"] == stops[0]:
-                # let passengers off at this floor
-                action = STOP
-                stops.pop(0)
+                action = MOVE
+                if elevator["floor"] == stops[0]:
+                    # let passengers off at this floor
+                    action = STOP
+                    stops.pop(0)
+                else:
+                    if direction == UP and elevator["floor"] > stops[0]:
+                        direction = DOWN
+                    elif direction == DOWN and elevator["floor"] < stops[0]:
+                        direction = UP
             else:
-                pass
+                # if there are no stops assigned, go to the resting floor
+                if elevator["floor"] > resting_floor:
+                    direction = DOWN
+                elif elevator["floor"] < resting_floor:
+                    direction = UP
+                else:
+                    action = STOP
+
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
