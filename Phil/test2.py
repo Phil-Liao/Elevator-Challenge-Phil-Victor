@@ -7,7 +7,7 @@ def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
         event="secondspace2025",
-        building_name="big_random",
+        building_name="85_sky_tower",
         bot="the_best_bot_by_Phil_and_Victor",
         email="cheweiphil@gmail.com",
         sandbox=True,
@@ -69,6 +69,8 @@ def updown_bot():
                             if elevator["floor"] in assigned_requests:
                                 assigned_requests.remove(elevator["floor"])
                             break
+                stopping_plan[elevator["id"]]["stops"] = list(set(stopping_plan[elevator["id"]]["stops"]))
+                stopping_plan[elevator["id"]]["stops"].sort()
             else:
                 # if there are no stops assigned, go to the resting floor
                 if elevator["floor"] > resting_floor:
@@ -77,8 +79,7 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-            stopping_plan[elevator["id"]]["stops"] = list(set(stopping_plan[elevator["id"]]["stops"]))
-            stopping_plan[elevator["id"]]["stops"].sort()
+
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
             print(f'*Elevator {elevator["id"]} :\nstops: {stops}\nbutton_pressed: {elevator["buttons_pressed"]}\nfloor: {elevator["floor"]}\naction: {action}\ndirection: {direction}')
         current_state = simulation.send(commands)
