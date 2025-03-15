@@ -14,8 +14,9 @@ def updown_bot():
     )
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
-    stopping_plan = initial_stopping_plan(current_state["num_floors"], current_state["elevators"])  # floors where the elevator should stop
+    stopping_plan = initial_stopping_plan(current_state["num_floors"], current_state["elevators"]) # floors where the elevator should stop
     assigned_requests = []
+
 
     print(f"Stopping Plan: {stopping_plan}")
 
@@ -73,7 +74,7 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-      
+
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
