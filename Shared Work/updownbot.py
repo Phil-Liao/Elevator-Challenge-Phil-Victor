@@ -48,6 +48,7 @@ def updown_bot():
                         direction = UP
             else:
                 # if there are no stops assigned, go to the resting floor
+                action = MOVE
                 if elevator["floor"] > resting_floor:
                     direction = DOWN
                 elif elevator["floor"] < resting_floor:
