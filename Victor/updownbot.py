@@ -47,6 +47,11 @@ def updown_bot():
             resting_floor = stopping_plan[elevator["id"]]["resting_floor"]
             directions[elevator["id"]] = direction
 
+            if direction == UP and elevator["floor"] > stops[0]:
+                direction = DOWN
+            elif direction == DOWN and elevator["floor"] < stops[0]:
+                direction = UP
+
             action = MOVE
             if elevator["floor"] in elevator["buttons_pressed"]:
                 # let passengers off at this floor
