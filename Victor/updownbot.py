@@ -14,6 +14,7 @@ def updown_bot():
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
     stopping_plan = {}  # floors where the elevator should stop
+    assigned_requests = []
 
     for elevator in current_state["elevators"]:
         stopping_plan[elevator["id"]] = {
@@ -28,9 +29,12 @@ def updown_bot():
         commands = []
         # assigning requests to elevators
         for request in requests:
+            if request["floor"] in assigned_requests:
+                continue
             closest_elevator = assign_elevator(current_state["elevators"], request)
             if closest_elevator:
                 stopping_plan[closest_elevator["id"]]["stops"].append(request["floor"])
+                assigned_requests.append(request["floor"])
                 print(f"Assigned floor {request['floor']} to elevator {closest_elevator['id']}")
 
         for elevator in current_state["elevators"]:
@@ -58,9 +62,11 @@ def updown_bot():
                     for request in requests:
                         if request["floor"] == elevator["floor"]:
                             direction = request["direction"]
+                            assigned_requests.remove(elevator["floor"])
                             break
                     for button_pressed in elevator["buttons_pressed"]:
-                        individual_nevigation(stops, button_pressed, elevator["floor"])
+                        stops = individual_nevigation(stops, button_pressed, elevator["floor"])
+                    print(f"New stops: {stops}")
             else:
                 # if there are no stops assigned, go to the resting floor
                 if elevator["floor"] > resting_floor:
@@ -69,6 +75,12 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
+
+            # Check if the elevator should stop at the floor where the button is pressed
+            if elevator["floor"] in elevator["buttons_pressed"]:
+                action = STOP
+                elevator["buttons_pressed"].remove(elevator["floor"])
+                print(f"Stopping at floor {elevator['floor']} due to button press")
 
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
