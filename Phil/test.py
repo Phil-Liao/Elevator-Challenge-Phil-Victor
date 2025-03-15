@@ -7,7 +7,7 @@ def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
         event="secondspace2025",
-        building_name="tiny_random",
+        building_name="medium_random",
         bot="updown-python-bot",
         email="bob@mail.com",
         sandbox=True,
@@ -25,7 +25,7 @@ def updown_bot():
         for request in requests:
             if request["floor"] in assigned_requests:
                 continue
-            closest_elevator = assign_elevator(current_state["elevators"], request, directions)
+            closest_elevator = assign_elevator(current_state["elevators"], request)
             if closest_elevator:
                 stopping_plan = individual_navigation(stopping_plan, closest_elevator["id"], request["floor"], closest_elevator["floor"])
                 assigned_requests.append(request["floor"])
@@ -46,6 +46,7 @@ def updown_bot():
                     if button_pressed not in stops:
                         stops.append(button_pressed)
                     stopping_plan = individual_navigation(stopping_plan, elevator["id"], request["floor"], elevator["floor"])
+            
 
             if stops:
                 # if there are stops planned
@@ -63,7 +64,8 @@ def updown_bot():
                     for request in requests:
                         if request["floor"] == elevator["floor"]:
                             direction = request["direction"]
-                            assigned_requests.remove(elevator["floor"])
+                            if elevator["floor"] in assigned_requests:
+                                assigned_requests.remove(elevator["floor"])
                             break
             else:
                 # if there are no stops assigned, go to the resting floor
@@ -73,7 +75,8 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-
+            stopping_plan[elevator["id"]]["stops"] = list(set(stopping_plan[elevator["id"]]["stops"]))
+            stopping_plan[elevator["id"]]["stops"] = sorted(stopping_plan[elevator["id"]]["stops"])
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
             print(f'*Elevator {elevator["id"]} :\nstops: {stops}\nbutton_pressed: {elevator["buttons_pressed"]}\nfloor: {elevator["floor"]}\naction: {action}\ndirection: {direction}')
         current_state = simulation.send(commands)
