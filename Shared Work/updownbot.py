@@ -13,14 +13,19 @@ def updown_bot():
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
     stopping_plan = {} # floors where the elevator should stop
+    
     for elevator in current_state["elevators"]:
-        stopping_plan[elevator["id"]] = []
+        stopping_plan[elevator["id"]] = {
+            "stops": [],
+            "resting_floor": int(simulation.num_floors/2)
+        }
 
     while current_state["running"]:
         requests = current_state["requests"]
         print(requests)
-        # assigning requests to elevators
         commands = []
+        # assigning requests to elevators
+        
         for elevator in current_state["elevators"]:
             # determine which direction to go
             direction = directions.get(elevator["id"], UP)
