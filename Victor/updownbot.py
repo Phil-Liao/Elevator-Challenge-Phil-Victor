@@ -37,8 +37,6 @@ def updown_bot():
     while current_state["running"]:
         requests = current_state["requests"]
         # assigning requests to elevators
-        individual_nevigation()
-
         commands = []
         for elevator in current_state["elevators"]:
             # determine which direction to go
@@ -53,6 +51,12 @@ def updown_bot():
                 direction = UP
 
             action = MOVE
+            if elevator["floor"] == stops[0]:
+                # let passengers off at this floor
+                action = STOP
+                stops.pop(0)
+            else:
+                pass
             
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
             print(direction)
