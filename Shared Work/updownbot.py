@@ -39,7 +39,7 @@ def updown_bot():
             stops = stopping_plan[elevator["id"]]["stops"]
             resting_floor = stopping_plan[elevator["id"]]["resting_floor"]
             directions[elevator["id"]] = direction
-
+            print(f"direction={directions}")
             action = MOVE  # Initialize action to MOVE by default
 
             print(f"button pressed :{elevator['buttons_pressed']}")
@@ -47,7 +47,7 @@ def updown_bot():
                 for button_pressed in elevator["buttons_pressed"]:
                     if button_pressed not in stops:
                         stops.append(button_pressed)
-                    stops = individual_nevigation(stops, button_pressed, elevator["floor"])
+                    stopping_plan = individual_navigation(stopping_plan, elevator["id"], request["floor"], elevator["floor"])
 
             if stops:
                 # if there are stops planned
