@@ -53,15 +53,7 @@ def updown_bot():
                 direction = UP
 
             action = MOVE
-            if elevator["floor"] in elevator["buttons_pressed"]:
-                # let passengers off at this floor
-                action = STOP
-            else:
-                for request in current_state["requests"]:
-                    if request["floor"] == elevator["floor"]:
-                        # someone requested the current floor
-                        action = STOP
-                        assigned_requests.discard((request["floor"], request["direction"]))  # remove request from assigned
+            
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
             print(direction)
         current_state = simulation.send(commands)
