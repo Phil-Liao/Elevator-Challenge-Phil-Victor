@@ -47,10 +47,12 @@ def updown_bot():
 
             action = MOVE  # Initialize action to MOVE by default
 
-            print(elevator["buttons_pressed"])
-            for button_pressed in elevator["buttons_pressed"]:
-                stops = individual_nevigation(stops, button_pressed, elevator["floor"])
-            print(f"New stops: {stops}")
+            print(f"button pressed :{elevator['buttons_pressed']}")
+            if elevator["buttons_pressed"]:
+                for button_pressed in elevator["buttons_pressed"]:
+                    if button_pressed not in stops:
+                        stops.append(button_pressed)
+                    stops = individual_nevigation(stops, button_pressed, elevator["floor"])
 
             if stops:
                 # if there are stops planned
@@ -63,7 +65,7 @@ def updown_bot():
                     # let passengers off at this floor
                     action = STOP
                     print(f"Stopping at floor {elevator['floor']}")
-                    stops.pop(0)
+                    stops.pop(0)  # Remove the first value from the stops list
                     # Change direction to match the passenger's request direction
                     for request in requests:
                         if request["floor"] == elevator["floor"]:
@@ -78,8 +80,9 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-      
+
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
+            print(f'*Elevator {elevator["id"]} :\nstops: {stops}\nbutton_pressed: {elevator["buttons_pressed"]}\nfloor: {elevator["floor"]}\naction: {action}\ndirection: {direction}')
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
     print("Replay URL:", current_state.get("replay_url"))

@@ -7,9 +7,9 @@ def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
         event="secondspace2025",
-        building_name="tiny_random",
-        bot="updown-python-bot",
-        email="bob@mail.com",
+        building_name="medium_random",
+        bot="phil-and-victor-bot",
+        email="victorhsiao5@gmail.com",
         sandbox=True,
     )
     current_state = simulation.initial_state
