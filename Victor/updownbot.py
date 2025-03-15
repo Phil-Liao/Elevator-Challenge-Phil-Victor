@@ -19,12 +19,12 @@ def updown_bot():
     assigned_requests = []
     num_floors = simulation.num_floors
     elevator_data = current_state["elevators"]
-    stopping_plan = initial_stopping_plan(num_floors, elevator_data)
+    initial_stopping_plan = initial_stopping_plan(num_floors, elevator_data)
 
     for elevator in current_state["elevators"]:
         stopping_plan[elevator["id"]] = {
             "stops": [],
-            "resting_floor": stopping_plan[elevator["id"]]["resting_floor"]
+            "resting_floor": initial_stopping_plan[elevator["id"]]["resting_floor"]
         }
     print(f"Stopping Plan: {stopping_plan}")
 
@@ -32,13 +32,15 @@ def updown_bot():
         requests = current_state["requests"]
         print(f"Requests :{requests}")
         commands = []
+
         # assigning requests to elevators
         for request in requests:
             if request["floor"] in assigned_requests:
                 continue
             closest_elevator = assign_elevator(current_state["elevators"], request)
             if closest_elevator:
-                stopping_plan[closest_elevator["id"]]["stops"].append(request["floor"])
+                stops = stopping_plan[closest_elevator["id"]]["stops"]
+                stopping_plan[closest_elevator["id"]]["stops"] = individual_nevigation(stops, request["floor"], closest_elevator["floor"])
                 assigned_requests.append(request["floor"])
                 print(f"Assigned floor {request['floor']} to elevator {closest_elevator['id']}")
 
@@ -53,7 +55,8 @@ def updown_bot():
 
             print(elevator["buttons_pressed"])
             for button_pressed in elevator["buttons_pressed"]:
-                stops = individual_nevigation(stops, button_pressed, elevator["floor"])
+                if not (button_pressed in stops):
+                    stops = individual_nevigation(stops, button_pressed, elevator["floor"])
             print(f"New stops: {stops}")
 
             if stops:
