@@ -1,10 +1,10 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
 
-def individual_nevigation(stops, floors_assigned, current_floor, resting_floor):
+def individual_nevigation(stops:list[int], floors_assigned:int, current_floor:int) -> list[list]:
     # only take on floors_assigned when the elevator is empty
     # OR the elevator will pass the floor and heading the same direction
     stops = sorted(stops)
-    if not stops and (floors_assigned > (current_floor & floors_assigned[""]) or floors_assigned < (current_floor & floors_assigned)):
+    if not stops and (floors_assigned > (current_floor & floors_assigned) or floors_assigned < (current_floor & floors_assigned)):
         print(f"the elevator cannnot accept the floor: {floors_assigned}")
     else:
         stops.append(floors_assigned)
@@ -52,9 +52,10 @@ def updown_bot():
             directions[elevator["id"]] = direction
 
             action = MOVE
-            if elevator["floor"] in elevator["buttons_pressed"]:
+            if elevator["floor"] in stopping_plan[elevator["id"]]:
                 # let passengers off at this floor
                 action = STOP
+                stopping_plan[elevator["id"]].remove()
             else:
                 for request in current_state["requests"]:
                     if request["floor"] == elevator["floor"]:
@@ -62,7 +63,6 @@ def updown_bot():
                         action = STOP
                         assigned_requests.discard((request["floor"], request["direction"]))  # remove request from assigned
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
-            print(direction)
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
     print("Replay URL:", current_state.get("replay_url"))
