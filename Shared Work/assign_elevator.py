@@ -1,4 +1,12 @@
+def assign_elevator(elevators, request):
+    closest_elevator = None
+    min_distance = float('inf')
 
-def assign_elevator(floors_requested:list[int], stopping_plan:dict) -> dict:
-    for plan_per_elevator in stopping_plan:
-        
+    for elevator in elevators:
+        if not elevator["buttons_pressed"]:  # Check if the elevator is not busy
+            distance = abs(elevator["floor"] - request["floor"])
+            if distance < min_distance:
+                min_distance = distance
+                closest_elevator = elevator
+
+    return closest_elevator
