@@ -46,6 +46,11 @@ def updown_bot():
 
             action = MOVE  # Initialize action to MOVE by default
 
+            print(elevator["buttons_pressed"])
+            for button_pressed in elevator["buttons_pressed"]:
+                stops = individual_nevigation(stops, button_pressed, elevator["floor"])
+            print(f"New stops: {stops}")
+
             if stops:
                 # if there are stops planned
                 if direction == UP and elevator["floor"] > stops[0]:
@@ -64,9 +69,6 @@ def updown_bot():
                             direction = request["direction"]
                             assigned_requests.remove(elevator["floor"])
                             break
-                    for button_pressed in elevator["buttons_pressed"]:
-                        stops = individual_nevigation(stops, button_pressed, elevator["floor"])
-                    print(f"New stops: {stops}")
             else:
                 # if there are no stops assigned, go to the resting floor
                 if elevator["floor"] > resting_floor:
@@ -75,12 +77,6 @@ def updown_bot():
                     direction = UP
                 else:
                     action = STOP
-
-            # Check if the elevator should stop at the floor where the button is pressed
-            if elevator["floor"] in elevator["buttons_pressed"]:
-                action = STOP
-                elevator["buttons_pressed"].remove(elevator["floor"])
-                print(f"Stopping at floor {elevator['floor']} due to button press")
 
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
