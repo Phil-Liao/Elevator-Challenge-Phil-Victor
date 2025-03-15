@@ -1,5 +1,5 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
-from individual_nevigation import individual_nevigation
+from individual_navigation import individual_navigation
 from assign_elevator import assign_elevator
 from initial_stopping_plan import initial_stopping_plan
 
@@ -14,14 +14,9 @@ def updown_bot():
     )
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
-    stopping_plan = {}  # floors where the elevator should stop
+    stopping_plan = initial_stopping_plan(current_state["num_floors"], current_state["elevators"])  # floors where the elevator should stop
     assigned_requests = []
 
-    for elevator in current_state["elevators"]:
-        stopping_plan[elevator["id"]] = {
-            "stops": [],
-            "resting_floor": int(simulation.num_floors / 2)
-        }
     print(f"Stopping Plan: {stopping_plan}")
 
     while current_state["running"]:
@@ -34,7 +29,7 @@ def updown_bot():
                 continue
             closest_elevator = assign_elevator(current_state["elevators"], request)
             if closest_elevator:
-                stopping_plan[closest_elevator["id"]]["stops"].append(request["floor"])
+                stopping_plan = individual_navigation(stopping_plan, closest_elevator["id"], request["floor"], closest_elevator["floor"])
                 assigned_requests.append(request["floor"])
                 print(f"Assigned floor {request['floor']} to elevator {closest_elevator['id']}")
 

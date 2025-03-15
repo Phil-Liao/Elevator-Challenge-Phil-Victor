@@ -1,6 +1,7 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
 from individual_nevigation import individual_nevigation
 from assign_elevator import assign_elevator
+from initial_stopping_plan import initial_stopping_plan
 
 
 def updown_bot():
@@ -16,11 +17,14 @@ def updown_bot():
     directions = {}  # current directions of elevators
     stopping_plan = {}  # floors where the elevator should stop
     assigned_requests = []
+    num_floors = simulation.num_floors
+    elevator_data = current_state["elevators"]
+    stopping_plan = initial_stopping_plan(num_floors, elevator_data)
 
     for elevator in current_state["elevators"]:
         stopping_plan[elevator["id"]] = {
             "stops": [],
-            "resting_floor": int(simulation.num_floors / 2)
+            "resting_floor": stopping_plan[elevator["id"]]["resting_floor"]
         }
     print(f"Stopping Plan: {stopping_plan}")
 
@@ -63,7 +67,7 @@ def updown_bot():
                     # let passengers off at this floor
                     action = STOP
                     print(f"Stopping at floor {elevator['floor']}")
-                    stops.pop(0)
+                    stops.remove(elevator["floor"])
                     # Change direction to match the passenger's request direction
                     for request in requests:
                         if request["floor"] == elevator["floor"]:
