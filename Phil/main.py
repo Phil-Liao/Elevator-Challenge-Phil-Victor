@@ -13,6 +13,7 @@ def updown_bot():
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
     while current_state["running"]:
+        print(current_state)
         commands = []
         for elevator in current_state["elevators"]:
             # determine which direction to go
