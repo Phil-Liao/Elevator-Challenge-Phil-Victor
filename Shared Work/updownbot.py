@@ -23,6 +23,7 @@ def updown_bot():
         requests = current_state["requests"]
         print(f"Requests :{requests}")
         commands = []
+        stops = []
         # assigning requests to elevators
         for request in requests:
             if request["floor"] in assigned_requests:
