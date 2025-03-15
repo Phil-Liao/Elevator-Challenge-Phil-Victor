@@ -48,7 +48,7 @@ def updown_bot():
                 for button_pressed in elevator["buttons_pressed"]:
                     if button_pressed not in stops:
                         stops.append(button_pressed)
-                    stopping_plan = individual_navigation(stopping_plan, elevator["id"], request["floor"], elevator["floor"])
+                stopping_plan[elevator["id"]]["stops"] = sorted(stops)
 
             if stops:
                 # if there are stops planned
@@ -68,6 +68,13 @@ def updown_bot():
                             direction = request["direction"]
                             assigned_requests.remove(elevator["floor"])
                             break
+                    # Ensure the elevator continues to the next stop after picking up a passenger
+                    if stops:
+                        next_stop = stops[0]
+                        if elevator["floor"] < next_stop:
+                            direction = UP
+                        elif elevator["floor"] > next_stop:
+                            direction = DOWN
             else:
                 # if there are no stops assigned, go to the resting floor
                 if elevator["floor"] > resting_floor:
@@ -77,6 +84,8 @@ def updown_bot():
                 else:
                     action = STOP
 
+            stopping_plan[elevator["id"]]["stops"] = list(set(stopping_plan[elevator["id"]]["stops"]))
+            stopping_plan[elevator["id"]]["stops"] = sorted(stopping_plan[elevator["id"]]["stops"])
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
             print(f'*Elevator {elevator["id"]} :\nstops: {stops}\nbutton_pressed: {elevator["buttons_pressed"]}\nfloor: {elevator["floor"]}\naction: {action}\ndirection: {direction}')
         current_state = simulation.send(commands)
