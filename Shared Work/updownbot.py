@@ -41,30 +41,22 @@ def updown_bot():
         for elevator in current_state["elevators"]:
             # determine which direction to go
             direction = directions.get(elevator["id"], UP)
-            if elevator["buttons_pressed"]:
-                # go to the floor where the button is pressed inside the elevator
-                direction = UP if destination_floor > elevator["floor"] else DOWN
-            else:
-                # go to the requested floor directly
-                for request in current_state["requests"]:
-                    request_tuple = (request["floor"], request["direction"])
-                    if request_tuple not in assigned_requests and request["floor"] != elevator["floor"]:
-                        direction = UP if request["floor"] > elevator["floor"] else DOWN
-                        assigned_requests.add(request_tuple)
-                        break
+            stops = stopping_plan[elevator["id"]]["stops"]
+            resting_floor = stopping_plan[elevator["id"]]["resting_floor"]
             directions[elevator["id"]] = direction
 
+            if direction == UP and elevator["floor"] > stops[0]:
+                direction = DOWN
+            elif direction == DOWN and elevator["floor"] < stops[0]:
+                direction = UP
+
             action = MOVE
-            if elevator["floor"] in stopping_plan[elevator["id"]]:
+            if elevator["floor"] == stops[0]:
                 # let passengers off at this floor
                 action = STOP
-                stopping_plan[elevator["id"]].remove()
+                stops.pop(0)
             else:
-                for request in current_state["requests"]:
-                    if request["floor"] == elevator["floor"]:
-                        # someone requested the current floor
-                        action = STOP
-                        assigned_requests.discard((request["floor"], request["direction"]))  # remove request from assigned
+                pass
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
