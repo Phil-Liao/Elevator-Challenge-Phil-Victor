@@ -7,9 +7,6 @@ def individual_nevigation(stops:list[int], floors_assigned:int, current_floor:in
         floors_assigned (int): The floor that is assigned to the elevator.
         current_floor (int): The current floor of the elevator.
     """
-    # only take on floors_assigned when the elevator is empty
-    # OR the elevator will pass the floor and heading the same direction
-    stops = sorted(stops)
     stops.append(floors_assigned)
     stops = sorted(stops)
     if current_floor < stops[0]:
