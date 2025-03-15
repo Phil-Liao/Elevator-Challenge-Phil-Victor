@@ -1,19 +1,7 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
-
-
-def individual_nevigation(stops, floors_assigned, current_floor, resting_floor):
-    # only take on floors_assigned when the elevator is empty
-    # OR the elevator will pass the floor
-    stops = sorted(stops)
-    if not stops and (floors_assigned > (current_floor & floors_assigned[""]) or floors_assigned < (current_floor & floors_assigned)):
-        print(f"the elevator cannnot accept the floor: {floors_assigned}")
-    else:
-        stops.append(floors_assigned)
-        stops = sorted(stops)
-        if current_floor <
-    return stops
-
-
+from individual_nevigation import individual_nevigation
+from assign_elevator import assign_elevator
+from initial_stopping_plan import initial_stopping_plan
 
 
 def updown_bot():
@@ -27,46 +15,64 @@ def updown_bot():
     )
     current_state = simulation.initial_state
     directions = {}  # current directions of elevators
-    stopping_plan = {} # floors where the elevator should stop
-    for elevator in current_state["elevators"]:
-        stopping_plan[elevator["id"]] = []
+    stopping_plan = initial_stopping_plan(current_state["num_floors"], current_state["elevators"])  # floors where the elevator should stop
+
+
+    print(f"Stopping Plan: {stopping_plan}")
 
     while current_state["running"]:
         requests = current_state["requests"]
-        # assigning requests to elevators
+        print(f"Requests :{requests}")
         commands = []
+        # assigning requests to elevators
+        for request in requests:
+            closest_elevator = assign_elevator(current_state["elevators"], request)
+            if closest_elevator:
+                stopping_plan[closest_elevator["id"]]["stops"].append(request["floor"])
+                print(f"Assigned floor {request['floor']} to elevator {closest_elevator['id']}")
+
         for elevator in current_state["elevators"]:
             # determine which direction to go
             direction = directions.get(elevator["id"], UP)
-            if elevator["buttons_pressed"]:
-                # go to the floor where the button is pressed inside the elevator
-                direction = UP if destination_floor > elevator["floor"] else DOWN
-            else:
-                # go to the requested floor directly
-                for request in current_state["requests"]:
-                    request_tuple = (request["floor"], request["direction"])
-                    if request_tuple not in assigned_requests and request["floor"] != elevator["floor"]:
-                        direction = UP if request["floor"] > elevator["floor"] else DOWN
-                        assigned_requests.add(request_tuple)
-                        break
+            stops = stopping_plan[elevator["id"]]["stops"]
+            resting_floor = stopping_plan[elevator["id"]]["resting_floor"]
             directions[elevator["id"]] = direction
 
-            action = MOVE
-            if elevator["floor"] in elevator["buttons_pressed"]:
-                # let passengers off at this floor
-                action = STOP
+            action = MOVE  # Initialize action to MOVE by default
+
+            if stops:
+                # if there are stops planned
+                if direction == UP and elevator["floor"] > stops[0]:
+                    direction = DOWN
+                elif direction == DOWN and elevator["floor"] < stops[0]:
+                    direction = UP
+
+                if elevator["floor"] in stops:
+                    print(True)
+                    # let passengers off at this floor
+                    action = STOP
+                    print(f"Stopping at floor {elevator['floor']}")
+                    stops.pop(0)
+                    # Change direction to match the passenger's request direction
+                    for request in requests:
+                        if request["floor"] == elevator["floor"]:
+                            direction = request["direction"]
+                            break
+                    for button_pressed in elevator["buttons_pressed"]:
+                        individual_nevigation(stops, button_pressed, elevator["floor"])
             else:
-                for request in current_state["requests"]:
-                    if request["floor"] == elevator["floor"]:
-                        # someone requested the current floor
-                        action = STOP
-                        assigned_requests.discard((request["floor"], request["direction"]))  # remove request from assigned
+                # if there are no stops assigned, go to the resting floor
+                if elevator["floor"] > resting_floor:
+                    direction = DOWN
+                elif elevator["floor"] < resting_floor:
+                    direction = UP
+                else:
+                    action = STOP
+
             commands.append(Command(elevator_id=elevator["id"], direction=direction, action=action))
-            print(direction)
         current_state = simulation.send(commands)
     print("Score:", current_state.get("score"))
     print("Replay URL:", current_state.get("replay_url"))
-
 
 if __name__ == "__main__":
     updown_bot()

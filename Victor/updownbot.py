@@ -2,6 +2,7 @@ from api import Command, Simulation, UP, DOWN, MOVE, STOP
 from individual_nevigation import individual_nevigation
 from assign_elevator import assign_elevator
 
+
 def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
     simulation = Simulation(
