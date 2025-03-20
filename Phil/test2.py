@@ -1,7 +1,7 @@
 from api import Command, Simulation, UP, DOWN, MOVE, STOP
 from individual_navigation import individual_navigation
 from assign_elevator import assign_elevator, dynamic_scheduling
-from initial_stopping_plan import initial_stopping_plan
+from initial_stopping_plan import initial_stopping_plan, initial_stopping_plan_2
 
 def updown_bot():
     """An example bot that sends elevators up and down and stops at floors if there are passengers waiting to get on or off"""
@@ -16,6 +16,8 @@ def updown_bot():
     directions = {}  # current directions of elevators
     floors = current_state["num_floors"]
     stopping_plan = initial_stopping_plan(floors, current_state["elevators"])  # floors where the elevator should stop
+    #stopping_plan = initial_stopping_plan(floors, current_state["elevators"])  # floors where the elevator should stop
+
     assigned_requests = []
     
 
